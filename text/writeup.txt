@@ -1,0 +1,20 @@
+Aim: 
+- Reduce Mean Log Error of the Zestimate.
+
+What do I have? 
+- properties_2016.csv : Full list of real estate properties in 3 counties in California 
+- train data : All the transactions before October 15, 2016, plus some of the transactions after October 15, 2016
+- test data : Has rest of transactions between October 15 - December 31st, 2016
+
+What should I predict? 
+- Predict the log-error between Zillow's Zestimate and the actual sale price given all the features of a home. 
+  [The log error is defined as  logerror=log(Zestimate)−log(SalePrice)]
+ - Predict this at six different points in time
+ 
+ What do I intend to do? 
+ - Understand what they would like us to submit thoroughly
+ - Start with looking at all 58 features of a house given in properties
+ - There seems to be a lot of missing values - what do I do with those? 
+ - Exploratory Data Analysis
+      - Look at the training data set - make plots of transaction dates, values of log error by date, distribution of log error, parcelID's
+      - Check which features have most missing values
