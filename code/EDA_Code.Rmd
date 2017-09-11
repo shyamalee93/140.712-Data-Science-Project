@@ -17,13 +17,13 @@ library(ggplot2)
 library(data.table)
 library(tidyr)
 
+setwd("..")
+zillow_property <- read.csv("properties_2016.csv")
 
-#zillow_property <- fread("../data/raw_data/properties_2016.csv")
-
-sample <- fread("./data/raw_data/sample_submission.csv")
+sample <- read.csv("sample_submission.csv")
 head(sample)
 
-train <- fread("./data/raw_data/train_2016_v2.csv")
+train <- read.csv("train_2016_v2.csv")
 head(train)
 ```
 
@@ -31,6 +31,7 @@ head(train)
 str(zillow_property)
 ```
 ```{r}
+# Air conditioning Type ID - Can vary from 1-13
 table(zillow_property$airconditioningtypeid)
 zillow_property$airconditioningtypeid <- as.factor(zillow_property$airconditioningtypeid)
 sum(is.na(zillow_property$airconditioningtypeid))
@@ -40,6 +41,7 @@ g + geom_bar(stat = "count")
 ```
 
 ```{r}
+# Architectural Style of the Home - 1 - 27
 table(zillow_property$architecturalstyletypeid)
 zillow_property$architecturalstyletypeid <- as.factor(zillow_property$architecturalstyletypeid)
 sum(is.na(zillow_property$architecturalstyletypeid))
@@ -56,8 +58,7 @@ qplot(zillow_property$basementsqft, geom="histogram")
 ```
 
 ```{r}
-#table(zillow_property$basementsqft)
-#zillow_property$architecturalstyletypeid <- as.factor(zillow_property$architecturalstyletypeid)
+# Number of bathrooms - between 0 and 10
 sum(is.na(zillow_property$bathroomcnt))
 sum(zillow_property$bathroomcnt==0,na.rm=T)
 qplot(zillow_property$bathroomcnt, geom="histogram")
