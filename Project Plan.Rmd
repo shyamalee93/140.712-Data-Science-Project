@@ -1,0 +1,33 @@
+---
+title: "Project Plan"
+author: "Shyamalee"
+date: "September 11, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Zillow Prize - Project for Advanced Data Science
+
+The Zillow Prize Competition on Kaggle: The participants are expected to predict future sale prices of homes, to make the mean error on their already existing Zestimate even smaller. 
+The submissions are evaluated on Mean absolute error defined as:
+
+$logerror=log(Zestimate)−log(SalePrice)$
+
+Our submission must have a log error at six different points in time for each unique property. 
+
+## Project Plan
+
+1. Start with looking at the dataset in R
+2. Data files :
+  + Properties.csv : Contains a list of all properties and 58 features for each properties
+  + train_2016 : Contains the training dataset which has the parcelID (Unique house identifier), transaction date and mean log error between actual sale price and Zestimate
+  + Submission file - Contains mean log error across six time periods for every individual parcel ID
+3. Do some Exploratory Data Analysis on properties.csv 
+  + Figure out the categorical and continuous variables
+  + Plot the distributions of continuous variables
+  + Check variables have over 75-80 percent missing values, check if they can be imputed or discard them
+  + Check if more variables can be determined: Ratios etc. 
+4. Check out the Datacamp module on Machine Learning, start building a basic algorithm

@@ -1,0 +1,319 @@
+---
+title: "EDA_Code"
+author: "Shyamalee"
+date: "September 8, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Read input files and load necessay libraries
+```{r input_files, message=FALSE, warning=FALSE}
+library(dplyr)
+library(ggplot2)
+library(data.table)
+library(tidyr)
+
+
+#zillow_property <- fread("../data/raw_data/properties_2016.csv")
+
+sample <- fread("./data/raw_data/sample_submission.csv")
+head(sample)
+
+train <- fread("./data/raw_data/train_2016_v2.csv")
+head(train)
+```
+
+```{r}
+str(zillow_property)
+```
+```{r}
+table(zillow_property$airconditioningtypeid)
+zillow_property$airconditioningtypeid <- as.factor(zillow_property$airconditioningtypeid)
+sum(is.na(zillow_property$airconditioningtypeid))
+g <- ggplot(zillow_property, aes(airconditioningtypeid))
+# Number of cars in each class:
+g + geom_bar(stat = "count")
+```
+
+```{r}
+table(zillow_property$architecturalstyletypeid)
+zillow_property$architecturalstyletypeid <- as.factor(zillow_property$architecturalstyletypeid)
+sum(is.na(zillow_property$architecturalstyletypeid))
+g <- ggplot(zillow_property, aes(architecturalstyletypeid))
+# Number of cars in each class:
+g + geom_bar(stat = "count")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+#zillow_property$architecturalstyletypeid <- as.factor(zillow_property$architecturalstyletypeid)
+sum(is.na(zillow_property$basementsqft))
+qplot(zillow_property$basementsqft, geom="histogram")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+#zillow_property$architecturalstyletypeid <- as.factor(zillow_property$architecturalstyletypeid)
+sum(is.na(zillow_property$bathroomcnt))
+sum(zillow_property$bathroomcnt==0,na.rm=T)
+qplot(zillow_property$bathroomcnt, geom="histogram")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+#zillow_property$architecturalstyletypeid <- as.factor(zillow_property$architecturalstyletypeid)
+sum(is.na(zillow_property$bedroomcnt))
+sum(zillow_property$bedroomcnt==0,na.rm=T)
+qplot(zillow_property$bedroomcnt, geom="histogram")
+```
+
+```{r}
+table(zillow_property$buildingclasstypeid)
+zillow_property$buildingclasstypeid <- as.factor(zillow_property$buildingclasstypeid)
+sum(is.na(zillow_property$buildingclasstypeid))
+g <- ggplot(zillow_property, aes(buildingclasstypeid))
+# Number of cars in each class:
+g + geom_bar(stat = "count")
+```
+
+
+```{r}
+table(zillow_property$buildingqualitytypeid)
+zillow_property$buildingqualitytypeid <- as.factor(zillow_property$buildingqualitytypeid)
+sum(is.na(zillow_property$buildingqualitytypeid))
+g <- ggplot(zillow_property, aes(buildingqualitytypeid))
+# Number of cars in each class:
+g + geom_bar(stat = "count")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$calculatedbathnbr)
+#zillow_property$architecturalstyletypeid <- as.factor(zillow_property$architecturalstyletypeid)
+sum(is.na(zillow_property$calculatedbathnbr))
+sum(zillow_property$calculatedbathnbr==0,na.rm=T)
+qplot(zillow_property$calculatedbathnbr, geom="histogram")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$decktypeid)
+zillow_property$decktypeid <- as.factor(zillow_property$decktypeid)
+sum(is.na(zillow_property$decktypeid))
+g <- ggplot(zillow_property, aes(decktypeid))
+# Number of cars in each class:
+g + geom_bar(stat = "count")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$finishedfloor1squarefeet)
+#zillow_property$architecturalstyletypeid <- as.factor(zillow_property$architecturalstyletypeid)
+sum(is.na(zillow_property$finishedfloor1squarefeet))
+sum(zillow_property$finishedfloor1squarefeet==0,na.rm=T)
+qplot(zillow_property$finishedfloor1squarefeet, geom="histogram")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$calculatedfinishedsquarefeet)
+#zillow_property$architecturalstyletypeid <- as.factor(zillow_property$architecturalstyletypeid)
+sum(is.na(zillow_property$calculatedfinishedsquarefeet))
+sum(zillow_property$calculatedfinishedsquarefeet==0,na.rm=T)
+qplot(zillow_property$calculatedfinishedsquarefeet, geom="histogram")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$finishedsquarefeet12)
+#zillow_property$architecturalstyletypeid <- as.factor(zillow_property$architecturalstyletypeid)
+sum(is.na(zillow_property$finishedsquarefeet12))
+sum(zillow_property$finishedsquarefeet12==0,na.rm=T)
+qplot(zillow_property$finishedsquarefeet12, geom="histogram")
+```
+
+```{r}
+str(zillow_property)
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$finishedsquarefeet13)
+#zillow_property$architecturalstyletypeid <- as.factor(zillow_property$architecturalstyletypeid)
+sum(is.na(zillow_property$finishedsquarefeet13))
+sum(zillow_property$finishedsquarefeet13==0,na.rm=T)
+qplot(zillow_property$finishedsquarefeet13, geom="histogram")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$finishedsquarefeet15)
+#zillow_property$architecturalstyletypeid <- as.factor(zillow_property$architecturalstyletypeid)
+sum(is.na(zillow_property$finishedsquarefeet15))
+sum(zillow_property$finishedsquarefeet15==0,na.rm=T)
+qplot(zillow_property$finishedsquarefeet15, geom="histogram")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$finishedsquarefeet50)
+#zillow_property$architecturalstyletypeid <- as.factor(zillow_property$architecturalstyletypeid)
+sum(is.na(zillow_property$finishedsquarefeet50))
+sum(zillow_property$finishedsquarefeet50==0,na.rm=T)
+qplot(zillow_property$finishedsquarefeet50, geom="histogram")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$finishedsquarefeet6)
+#zillow_property$architecturalstyletypeid <- as.factor(zillow_property$architecturalstyletypeid)
+sum(is.na(zillow_property$finishedsquarefeet6))
+sum(zillow_property$finishedsquarefeet6==0,na.rm=T)
+qplot(zillow_property$finishedsquarefeet6, geom="histogram")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$fips)
+zillow_property$fips <- as.factor(zillow_property$fips)
+sum(is.na(zillow_property$fips))
+g <- ggplot(zillow_property, aes(fips))
+# Number of cars in each class:
+g + geom_bar(stat = "count")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$fireplacecnt)
+zillow_property$fireplacecnt <- as.factor(zillow_property$fireplacecnt)
+sum(is.na(zillow_property$fireplacecnt))
+g <- ggplot(zillow_property, aes(fireplacecnt))
+# Number of cars in each class:
+g + geom_bar(stat = "count")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$fullbathcnt)
+zillow_property$fullbathcnt <- as.factor(zillow_property$fullbathcnt)
+sum(is.na(zillow_property$fullbathcnt))
+g <- ggplot(zillow_property, aes(fullbathcnt))
+# Number of cars in each class:
+g + geom_bar(stat = "count")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$garagecarcnt)
+zillow_property$garagecarcnt <- as.factor(zillow_property$garagecarcnt)
+sum(is.na(zillow_property$garagecarcnt))
+g <- ggplot(zillow_property, aes(garagecarcnt))
+# Number of cars in each class:
+g + geom_bar(stat = "count")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$garagetotalsqft)
+#zillow_property$architecturalstyletypeid <- as.factor(zillow_property$architecturalstyletypeid)
+sum(is.na(zillow_property$garagetotalsqft))
+sum(zillow_property$garagetotalsqft==0,na.rm=T)
+qplot(zillow_property$garagetotalsqft, geom="histogram")
+```
+
+```{r}
+str(zillow_property)
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$hashottuborspa)
+zillow_property$hashottuborspa <- as.factor(zillow_property$hashottuborspa)
+sum(is.na(zillow_property$hashottuborspa))
+g <- ggplot(zillow_property, aes(hashottuborspa))
+# Number of cars in each class:
+g + geom_bar(stat = "count")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$heatingorsystemtypeid)
+zillow_property$heatingorsystemtypeid <- as.factor(zillow_property$heatingorsystemtypeid)
+sum(is.na(zillow_property$heatingorsystemtypeid))
+g <- ggplot(zillow_property, aes(heatingorsystemtypeid))
+# Number of cars in each class:
+g + geom_bar(stat = "count")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$lotsizesquarefeet)
+#zillow_property$architecturalstyletypeid <- as.factor(zillow_property$architecturalstyletypeid)
+sum(is.na(zillow_property$lotsizesquarefeet))
+sum(zillow_property$lotsizesquarefeet==0,na.rm=T)
+qplot(zillow_property$lotsizesquarefeet, geom="histogram")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$poolcnt)
+zillow_property$poolcnt <- as.factor(zillow_property$poolcnt)
+sum(is.na(zillow_property$poolcnt))
+g <- ggplot(zillow_property, aes(poolcnt))
+# Number of cars in each class:
+g + geom_bar(stat = "count")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$poolsizesum)
+#zillow_property$architecturalstyletypeid <- as.factor(zillow_property$architecturalstyletypeid)
+sum(is.na(zillow_property$poolsizesum))
+sum(zillow_property$poolsizesum==0,na.rm=T)
+qplot(zillow_property$poolsizesum, geom="histogram")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$pooltypeid10)
+zillow_property$pooltypeid10 <- as.factor(zillow_property$pooltypeid10)
+sum(is.na(zillow_property$pooltypeid10))
+g <- ggplot(zillow_property, aes(pooltypeid10))
+# Number of cars in each class:
+g + geom_bar(stat = "count")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$pooltypeid2)
+zillow_property$pooltypeid2 <- as.factor(zillow_property$pooltypeid2)
+sum(is.na(zillow_property$pooltypeid2))
+g <- ggplot(zillow_property, aes(pooltypeid2))
+# Number of cars in each class:
+g + geom_bar(stat = "count")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$pooltypeid7)
+zillow_property$pooltypeid7 <- as.factor(zillow_property$pooltypeid7)
+sum(is.na(zillow_property$pooltypeid7))
+g <- ggplot(zillow_property, aes(pooltypeid7))
+# Number of cars in each class:
+g + geom_bar(stat = "count")
+```
+
+```{r}
+#table(zillow_property$basementsqft)
+unique(zillow_property$propertycountylandusecode)
+#zillow_property$propertycountylandusecode <- as.factor(zillow_property$propertycountylandusecode)
+sum(is.na(zillow_property$propertycountylandusecode))
+g <- ggplot(zillow_property, aes(propertycountylandusecode))
+# Number of cars in each class:
+g + geom_bar(stat = "count")
+```
+
