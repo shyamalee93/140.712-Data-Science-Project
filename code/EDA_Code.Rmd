@@ -1,7 +1,7 @@
 ---
 title: "EDA_Code"
 author: "Shyamalee"
-date: "September 8, 2017"
+date: "September 29, 2017"
 output: html_document
 ---
 
@@ -12,24 +12,42 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Read input files and load necessay libraries
 ```{r input_files, message=FALSE, warning=FALSE}
+library(data.table)
 library(dplyr)
 library(ggplot2)
-library(data.table)
+library(stringr)
+library(DT)
 library(tidyr)
+library(corrplot)
+library(leaflet)
+library(lubridate)
 
 setwd("..")
-zillow_property <- read.csv("properties_2016.csv")
+zillow_property <- read.csv("../properties_2016.csv")
 
-sample <- read.csv("sample_submission.csv")
+sample <- read.csv("../sample_submission.csv")
 head(sample)
 
-train <- read.csv("train_2016_v2.csv")
+train <- read.csv("../train_2016_v2.csv")
 head(train)
+
+train = merge(zillow_property, train, by="parcelid",all.y=TRUE)
+
+datatable(head(zillow_property,100), style="bootstrap", class="table-condensed", options = list(dom = 'tp',scrollX = TRUE)) 
+
+datatable(head(train,100), style="bootstrap", class="table-condensed", options = list(dom = 'tp'))
+
+tmp <- train %>% mutate(year_month = make_date(year=year(transactiondate),month=month(transactiondate)))
+tmp %>% 
+  group_by(year_month) %>% count() %>% 
+  ggplot(aes(x=year_month,y=n)) +
+  geom_bar(stat="identity", fill="red")+
+  geom_vline(aes(xintercept=as.numeric(as.Date("2016-10-01"))),size=2)
+
+
 ```
 
-```{r}
-str(zillow_property)
-```
+
 ```{r}
 # Air conditioning Type ID - Can vary from 1-13
 table(zillow_property$airconditioningtypeid)

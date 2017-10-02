@@ -1,0 +1,247 @@
+---
+title: "Initial_EDA"
+author: "Shyamalee"
+date: "October 1, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Read input files and load necessay libraries
+```{r input_files, message=FALSE, warning=FALSE}
+library(dplyr)
+library(ggplot2)
+library(data.table)
+library(tidyr)
+library(caret)
+library(Hmisc)
+library(mice)
+
+setwd("..")
+zillow_property <- read.csv("../properties_2016.csv")
+
+sample <- read.csv("../sample_submission.csv")
+head(sample)
+
+train <- read.csv("../train_2016_v2.csv")
+#head(train)
+
+train = merge(zillow_property, train, by="parcelid",all.y=TRUE)
+
+#Get percentage of NA's across features
+total_na = as.data.frame(sapply(train, function(x) round((sum(is.na(x))/length(x)) * 100,2)))
+colnames(total_na) <- "Percent_NA"
+total_na <- cbind(Features = rownames(total_na), total_na)
+total_na <- total_na %>% arrange(desc(Percent_NA))
+
+#If some feature has only one unique value, we could ignore them
+rapply(train, function(x)length(unique(x))<2)
+unique(train$assessmentyear)
+
+#Assessment Year has only value 2015. Take this off. 
+
+#Add a few more ?important columns
+train <- train %>% mutate(age_of_home = 2017 - train$yearbuilt)
+train = train %>% mutate(latitude = latitude/1000000, longitude = longitude/1000000)
+
+# If NA, no pools
+train$poolcnt[is.na(train$poolcnt)] = 0
+
+# If NA, just one unit
+train$unitcnt[is.na(train$unitcnt)] = 1
+
+#Is there a deck or not?
+train$decktypeid = ifelse(is.na(train$decktypeid), 0, 1) 
+
+# Fireplace - Yes/ no?
+train$fireplacecnt = ifelse(is.na(train$fireplacecnt), 0, 1) 
+
+# Set variables to 0 or 1
+train$taxdelinquencyflag = ifelse(train$taxdelinquencyflag == '', 0, 1)
+
+train$hashottuborspa = ifelse(train$hashottuborspa == '', 0, 1)
+
+train$airconditioningtypeid = ifelse(is.na(train$airconditioningtypeid),
+                              ifelse(train$heatingorsystemtypeid == 2, 1, train$airconditioningtypeid), ifelse(train$airconditioningtypeid == 5, 0, 1))
+
+train$heatingorsystemtypeid = ifelse(is.na(train$heatingorsystemtypeid), 0, 
+                              ifelse(train$heatingorsystemtypeid == 13, 0, 1))
+
+
+
+train$taxvaluedollarcnt = as.numeric(impute(train$taxvaluedollarcnt, mean))
+
+train$structuretaxvaluedollarcnt = as.numeric(impute(train$structuretaxvaluedollarcnt, mean))
+
+train$landtaxvaluedollarcnt = as.numeric(impute(train$landtaxvaluedollarcnt, mean))
+
+train$taxamount = as.numeric(impute(train$taxamount, mean))
+
+mode_ <- function(vec) {names(which.max(table(vec))) }
+
+train$bathroomcnt <- as.numeric(ifelse(train$bathroomcnt == 0, 
+                                                 mode_(train$bathroomcnt), 
+                                                 train$bathroomcnt))
+
+train$bathroomcnt <- as.numeric(impute(train$bathroomcnt, mode_(train$bathroomcnt)))
+
+train$bedroomcnt <- as.numeric(impute(train$bedroomcnt, mode_(train$bedroomcnt)))
+##
+train$regionidcounty <- as.numeric(impute(train$regionidcounty, mode_(train$regionidcounty)))
+
+train$longitude <- as.numeric(impute(train$longitude, mode_(train$longitude)))
+
+train$latitude <- as.numeric(impute(train$latitude, mode_(train$latitude)))
+
+train$regionidzip <- as.numeric(impute(train$regionidzip, mode_(train$regionidzip)))
+
+train$age_of_home = round(as.numeric(impute(train$age_of_home, mean)), 0)
+
+#train$yearbuilt <- NULL
+
+train$lotsizesquarefeet <- as.numeric(impute(train$lotsizesquarefeet, mean))
+
+train$calculatedfinishedsquarefeet <- as.numeric(impute(train$calculatedfinishedsquarefeet, mean))
+
+#train <- train %>% filter(!(is.na(train$regionidzip)))
+
+## Change variable types to factors
+
+cols_reduced <- names(train)
+
+cols_factors <- c('airconditioningtypeid', 'buildingqualitytypeid', 'decktypeid',
+                  'fireplacecnt', 'hashottuborspa', 'heatingorsystemtypeid', 
+                  'poolcnt', 'propertylandusetypeid', 'regionidcounty', 
+                  'regionidzip', 'taxdelinquencyflag')
+
+train[cols_factors] <- lapply(train[cols_factors], factor)
+
+train$garagecarcnt = as.numeric(train$garagecarcnt)
+
+train$unitcnt = as.numeric(train$unitcnt)
+
+## Imputation by Random Sampling
+
+imp_R <- function(vec) {
+  i=1; s=c()
+  samples <- sort(unique(vec))
+  numNAs <- sum(is.na(vec))
+  x <- table(vec)/length(vec)
+  while (i <= length(x)) {
+    s[i] = x[[i]][1]
+    i = i + 1
+  }
+  return(sample(samples, numNAs, prob = s, replace=T))
+}
+
+train$garagecarcnt[is.na(train$garagecarcnt)] = imp_R(train$garagecarcnt)
+
+train$airconditioningtypeid[is.na(train$airconditioningtypeid)] = imp_R(train$airconditioningtypeid)
+
+train$buildingqualitytypeid[is.na(train$buildingqualitytypeid)] = imp_R(train$buildingqualitytypeid)
+
+# Binary Variables are flags-
+train = dplyr::rename(train, acflag = airconditioningtypeid, deckflag = decktypeid, 
+                         fireplaceflag = fireplacecnt, hottubflag = hashottuborspa, heatflag = heatingorsystemtypeid, poolflag = poolcnt)
+
+train$property_group = as.factor(ifelse(train$propertylandusetypeid %in% c(31,46,47), "Commercial",
+                      ifelse(train$propertylandusetypeid %in% c(266,267,246,247,248), "Apartment",
+                      ifelse(train$propertylandusetypeid %in% c(269,290,291,274,270), "Land", "House"))))
+
+train$building_quality = as.factor(ifelse(train$buildingqualitytypeid %in% c(1,2,3,4), "Good",
+                            ifelse(train$buildingqualitytypeid %in% c(5,6,7,8), "Average", "Bad")))
+
+train$propertylandusetypeid <- NULL
+
+train$buildingqualitytypeid <- NULL
+
+write.csv(train, "Clean_train.csv")
+
+# Feature Engineering
+train$tax_ratio = train$taxvaluedollarcnt / train$taxamount
+train$living_area = train$calculatedfinishedsquarefeet / train$lotsizesquarefeet 
+train$totalroomNF = train$bathroomcnt + train$bedroomcnt
+train <- train[ , !duplicated(colnames(train))]
+taxgroup = train %>% group_by(., regionidzip) %>% summarise(., avgtaxamtNF = mean(taxamount))
+train = left_join(train, taxgroup, by='regionidzip')
+
+cols_keep <- c("parcelid", "logerror", "structuretaxvaluedollarcnt","landtaxvaluedollarcnt", "calculatedfinishedsquarefeet", "latitude", "longitude", "age_of_home", "lotsizesquarefeet", 
+               "tax_ratio", "living_area", "totalroomNF", "avgtaxamtNF")
+
+train <- train[ , (names(train) %in% cols_keep)]
+
+
+# Partition the training and test data (75% train, 25% test) on month:
+set.seed(0)
+trainIndex <- sample(1:nrow(train), nrow(train)*0.75)
+
+# training set
+subTrain <- train[ trainIndex,-1]
+
+## testing set
+subTest  <- train[-trainIndex,-1]
+
+# full training set
+fullTrain = train[,-1]
+
+# Partition the training and test data (75% train, 25% test) on month:
+set.seed(0)
+trainIndex <- sample(1:nrow(train_2), nrow(train_2)*0.75)
+
+# training set
+subTrain <- train_2[ trainIndex,-1]
+
+## testing set
+subTest  <- train_2[-trainIndex,-1]
+
+# full training set
+fullTrain = train_2[,-1]
+
+set.seed(0)
+oob.err = numeric(6)
+for(mtry in 1:6){
+  fit = randomForest(logerror ~., data = subTrain, mtry = mtry)
+  oob.err[mtry] = fit$mse[500]
+  cat("We're performing iteration", mtry, "\n")
+}
+
+## Visualize the OOB error rates as they change with the number of variables
+plot(1:6, oob.err, pch = 16, type = "b",
+     xlab = "Variables Considered at Each Split",
+     ylab = "OOB Mean Squared Error",
+     main = "Random Forest OOB Error Rates\nby # of Variables")
+print(oob.err) #get the best mtry
+
+
+## Change according to best mtry (caret)
+set.seed(0)
+bestrf = randomForest(logerror ~. , 
+                      data = subTrain, 
+                      mtry = 100000000000000, #change mtry mannually
+                      ntree = 100,
+                      importance=TRUE,
+                      do.trace = TRUE)
+
+## Check variable importance
+importance(bestrf)
+varImpPlot(bestrf)
+
+rf.pred = predict(bestrf, subTest, type = "response")
+
+sum(abs(subTest$logerror - rf.pred)) / nrow(subTest)
+
+cor(rf.pred)
+
+# CHANGE ACCORDING TO BEST NTREE
+set.seed(0)
+fullrf = randomForest(logerror ~. , 
+                      data = fullTrain, 
+                      mtry = 100000000000000000,#change mtry mannually
+                      ntree = 100, 
+                      importance=TRUE)
+
+
+train <- train[ , !(names(train) %in% cols_drop)]
