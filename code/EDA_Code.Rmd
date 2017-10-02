@@ -45,6 +45,41 @@ tmp %>%
   geom_vline(aes(xintercept=as.numeric(as.Date("2016-10-01"))),size=2)
 
 
+train <- train %>% mutate(abs_logerror = abs(logerror))
+train %>% 
+  ggplot(aes(x=abs_logerror)) + 
+  geom_histogram(bins=400, fill="red")+
+  theme_bw()+theme(axis.title = element_text(size=16),axis.text = element_text(size=14))+
+  ylab("Count")+coord_cartesian(x=c(0,0.5))
+
+train %>% 
+  mutate(year_month = make_date(year=year(transactiondate),month=month(transactiondate)) ) %>% 
+  group_by(year_month) %>% summarize(mean_abs_logerror = mean(abs_logerror)) %>% 
+  ggplot(aes(x=year_month,y=mean_abs_logerror)) + 
+  geom_line(size=1.5, color="blue")+
+  geom_point(size=5, color="blue")+theme_bw()
+
+train %>% 
+  mutate(year_month = make_date(year=year(transactiondate),month=month(transactiondate)) ) %>% 
+  group_by(year_month) %>% summarize(mean_logerror = mean(logerror)) %>% 
+  ggplot(aes(x=year_month,y=mean_logerror)) + 
+  geom_line(size=1.5, color="red")+geom_point(size=5, color="red")+theme_bw()
+
+## Missing Values
+missing_values <- train %>% summarize_each(funs(sum(is.na(.))/n()))
+
+missing_values <- gather(missing_values, key="feature", value="missing_pct")
+missing_values %>% 
+  ggplot(aes(x=reorder(feature,-missing_pct),y=missing_pct)) +
+  geom_bar(stat="identity",fill="red")+
+  coord_flip()+theme_bw()
+
+good_features <- filter(missing_values, missing_pct<0.75)
+
+vars <- good_features$feature[str_detect(good_features$feature,'num_')]
+tmp <- train %>% select(one_of(c(vars,"abs_logerror")))
+
+corrplot(cor(tmp, use="complete.obs"),type="lower")
 ```
 
 
