@@ -171,33 +171,29 @@ train = left_join(train, taxgroup, by='regionidzip')
 cols_keep <- c("parcelid", "logerror", "structuretaxvaluedollarcnt","landtaxvaluedollarcnt", "calculatedfinishedsquarefeet", "latitude", "longitude", "age_of_home", "lotsizesquarefeet", 
                "tax_ratio", "living_area", "totalroomNF", "avgtaxamtNF")
 
-train <- train[ , (names(train) %in% cols_keep)]
+train_2 <- train[ , (names(train) %in% cols_keep)]
 
 
 # Partition the training and test data (75% train, 25% test) on month:
-set.seed(0)
-trainIndex <- sample(1:nrow(train), nrow(train)*0.75)
+#set.seed(0)
+#trainIndex <- sample(1:nrow(train), nrow(train)*0.75)
 
 # training set
-subTrain <- train[ trainIndex,-1]
+#subTrain <- train[ trainIndex,-1]
 
 ## testing set
-subTest  <- train[-trainIndex,-1]
+#subTest  <- train[-trainIndex,-1]
 
 # full training set
-fullTrain = train[,-1]
+#fullTrain = train[,-1]
 
-# Partition the training and test data (75% train, 25% test) on month:
+# Partition into training and test data (75% train, 25% test) 
 set.seed(0)
 trainIndex <- sample(1:nrow(train_2), nrow(train_2)*0.75)
 
-# training set
+
 subTrain <- train_2[ trainIndex,-1]
-
-## testing set
 subTest  <- train_2[-trainIndex,-1]
-
-# full training set
 fullTrain = train_2[,-1]
 
 set.seed(0)
@@ -208,7 +204,7 @@ for(mtry in 1:6){
   cat("We're performing iteration", mtry, "\n")
 }
 
-## Visualize the OOB error rates as they change with the number of variables
+## Visualize the Out of bag error?
 plot(1:6, oob.err, pch = 16, type = "b",
      xlab = "Variables Considered at Each Split",
      ylab = "OOB Mean Squared Error",
@@ -235,7 +231,7 @@ sum(abs(subTest$logerror - rf.pred)) / nrow(subTest)
 
 cor(rf.pred)
 
-# CHANGE ACCORDING TO BEST NTREE
+# According to best tree
 set.seed(0)
 fullrf = randomForest(logerror ~. , 
                       data = fullTrain, 
