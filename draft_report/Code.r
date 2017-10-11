@@ -510,7 +510,7 @@ feature_names <- names(dtrain)
 dtrain <- data.matrix(dtrain)
 dtrain <- xgb.DMatrix(data=dtrain,label=target)
 
-# Set up cross-validation scheme (3-fold)
+# Set up cross-validation scheme (10-fold)
 foldsCV <- createFolds(target, k=10, list=TRUE, returnTrain=FALSE)
 
 # Set xgboost parameters. These are not necessarily the optimal parameters.
