@@ -209,7 +209,7 @@ total_na %>%
     ggplot(aes(x=reorder(Features, -Percent_NA), y=Percent_NA)) + 
     geom_bar(stat='identity', fill='red') +
     labs(x='', y='Percentage missing', title='Percent missing data by feature') +
-    theme(axis.text.x=element_text(angle=90, hjust=1, size=5)) + coord_flip() + theme_bw() 
+    theme(axis.text.x=element_text(angle=90, hjust=1, size=5)) + coord_flip() + theme_bw(base_size = 8) 
 ```
 \begin{center} Figure 1. Net Missing data by features in the given dataset \end{center}
 
@@ -252,7 +252,7 @@ train %>%
 
 importance_matrix <- readRDS("../Model_Output/XGBoost_Importancematrix.rds")
 ggplot(importance_matrix,aes(x=reorder(Feature,Gain),y=Gain,fill=Gain)) +
-  geom_bar(stat='identity',fill='turquoise4') +coord_flip() + theme_bw() + ggtitle('Variable Importance using XGBoost') +xlab(NULL) +
+  geom_bar(stat='identity',fill='turquoise4') +coord_flip() + theme_bw(base_size = 8) + ggtitle('Variable Importance using XGBoost') +xlab(NULL) +
   theme(plot.title = element_text(hjust = 0.5), text = element_text(size=9))
 
 ```
