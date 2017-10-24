@@ -90,9 +90,11 @@ library(kableExtra)
 library(doSNOW)
 library(h2o)
 
-zillow_property <- read.csv("../properties_2016.csv") 
-train <- read.csv("../train_2016_v2.csv")
-train = merge(zillow_property, train, by="parcelid",all.y=TRUE)
+#zillow_property <- read.csv(".././properties_2016.csv") 
+#train <- read.csv(".././train_2016_v2.csv")
+#train = merge(zillow_property, train, by="parcelid",all.y=TRUE)
+#save(train, file='train.rds')
+train <- readRDS("train.rds")
 
 #Get percentage of NA's across features
 total_na = as.data.frame(sapply(train, function(x) round((sum(is.na(x))/length(x)) * 100,5)))
@@ -207,17 +209,19 @@ total_na %>%
     ggplot(aes(x=reorder(Features, -Percent_NA), y=Percent_NA)) + 
     geom_bar(stat='identity', fill='red') +
     labs(x='', y='Percentage missing', title='Percent missing data by feature') +
-    theme(axis.text.x=element_text(angle=90, hjust=1)) + coord_flip() + theme_bw() 
+    theme(axis.text.x=element_text(angle=90, hjust=1, size=5)) + coord_flip() + theme_bw() 
 ```
 \begin{center} Figure 1. Net Missing data by features in the given dataset \end{center}
 
 ```{r, fig2, echo = FALSE, warning = FALSE, message = FALSE, tidy = TRUE}
 # Looking at correlation plot between continuous variables and log error
+
 title <- "Pairwise Correlation between continuous variables"
 
 continuous_vars <- c('bathroomcnt', 'bedroomcnt', 'calculatedbathnbr',     'finishedfloor1squarefeet', 'calculatedfinishedsquarefeet', 'finishedsquarefeet6', 'finishedsquarefeet12', 'finishedsquarefeet13','finishedsquarefeet15', 'finishedsquarefeet50', 'fireplacecnt','fullbathcnt', 'garagecarcnt', 'garagetotalsqft', 'poolcnt', 'roomcnt', 'threequarterbathnbr', 'unitcnt', 'numberofstories', 'logerror')
 
-corrplot(cor(train[, continuous_vars], use='pairwise.complete.obs'), type='lower', title = title)
+corrplot(cor(train[, continuous_vars], use='pairwise.complete.obs'), type='lower', tl.cex=0.6)
+title("\nPairwise Correlation between continuous variables")
 ```
 \begin{center} Figure 2. Correlation Plot showing the correlation between continuous features. We see the tax variables being positively correlated. \end{center}
 
@@ -246,10 +250,10 @@ train %>%
 
 ```{r xgboostplot, echo = FALSE, warning = FALSE, message = FALSE, tidy = TRUE }
 
-importance_matrix <- readRDS("XGBoost_Importancematrix.rds")
+importance_matrix <- readRDS("../Model_Output/XGBoost_Importancematrix.rds")
 ggplot(importance_matrix,aes(x=reorder(Feature,Gain),y=Gain,fill=Gain)) +
   geom_bar(stat='identity',fill='turquoise4') +coord_flip() + theme_bw() + ggtitle('Variable Importance using XGBoost') +xlab(NULL) +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5), text = element_text(size=9))
 
 ```
 \begin{center} Figure 5. Most important variables according to the XGBoost algorithm \end{center}
