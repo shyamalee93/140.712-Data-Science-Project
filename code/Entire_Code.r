@@ -16,15 +16,16 @@ library(glmnet)
 currentYear <- 2016   
 
 #Read in the property file with features
-zillow_property <- fread("../properties_2016.csv", header=TRUE, na.strings=c("", " ", "NA", "N/A", "null"),blank.lines.skip = TRUE, showProgress = FALSE, colClasses=list(character=50))  
+#zillow_property <- fread("../properties_2016.csv", header=TRUE, na.strings=c("", " ", "NA", "N/A", "null"),blank.lines.skip = TRUE, showProgress = FALSE, colClasses=list(character=50))  
 
-dim(zillow_property)
+#dim(zillow_property)
 
 ## Read the training file
-train <- fread("../train_2016_v2.csv")
+#train <- fread("../train_2016_v2.csv")
 
 ## Merge both
-train = zillow_property %>% right_join(., train, by = 'parcelid')
+#train = zillow_property %>% right_join(., train, by = 'parcelid')
+train <- train <- readRDS("./Code/train.rds")
 
 ## Function for mode - impute mode values
 mode_ <- function(x) {
