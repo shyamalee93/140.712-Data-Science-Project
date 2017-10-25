@@ -55,7 +55,7 @@ I can also check the distribution of logerror, the response variable. I would li
 ```{r, loadpackages, echo = FALSE, warning = FALSE, message = FALSE, tidy = TRUE}
 
 ## List of required packages
-packages<-c("dplyr", "Hmisc", "ggplot2","data.table", "tidyr", "caret", "mice", "randomForest", "magrittr", "lattice", "lubridate", "tidyverse", "corrplot", "leaflet", "htmltools", "DT", "gridextra", "doParallel", "xgboost", "doSNOW")
+packages<-c("dplyr", "Hmisc", "ggplot2","data.table", "tidyr", "caret", "mice", "randomForest", "magrittr", "lattice", "lubridate", "tidyverse", "corrplot", "leaflet", "htmltools", "DT", "gridextra", "doParallel", "xgboost", "doSNOW", "h2o", "kableExtra")
 
 for (i in packages){
   if(!require(i,character.only = T,quietly=T,warn.conflicts = F)){
@@ -88,7 +88,7 @@ library(xgboost)
 library(knitr)
 library(kableExtra)
 library(doSNOW)
-library(h2o)
+#library(h2o)
 
 #zillow_property <- read.csv(".././properties_2016.csv") 
 #train <- read.csv(".././train_2016_v2.csv")
